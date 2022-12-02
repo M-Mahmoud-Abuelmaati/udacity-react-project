@@ -5,12 +5,13 @@ import Book from './Book';
 const Books: FC<{
   books: bookType[];
   onHandleEditBook: Function;
+  updateFilteredBooksOnSelect?: Function
   title: string;
-}> = ({ books, title, onHandleEditBook }) => {
+}> = ({ books, title, onHandleEditBook, updateFilteredBooksOnSelect }) => {
   return (
     <div className="p-5 h-max max-h-max">
       {title !== 'None' && <h1 className="font-bold text-2xl pb-5">{title}</h1>}
-      <div className="flex justify-center gap-10 h-max">
+      <div className={`grid m-auto gap-10 h-max grid-cols-6`}>
         {books
           .filter((fb) => {
             if (title === 'None') {
@@ -28,6 +29,7 @@ const Books: FC<{
                 key={book.id}
                 book={book}
                 onHandleEditBook={onHandleEditBook}
+                updateFilteredBooksOnSelect={updateFilteredBooksOnSelect}
               />
             );
           })}

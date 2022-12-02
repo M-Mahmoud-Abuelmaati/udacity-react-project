@@ -5,7 +5,8 @@ import { bookType } from '../../Types';
 const Book: FC<{
   book: bookType;
   onHandleEditBook: Function;
-}> = ({ book, onHandleEditBook }) => {
+  updateFilteredBooksOnSelect?: Function;
+}> = ({ book, onHandleEditBook, updateFilteredBooksOnSelect }) => {
   const [bookStatus, setBookStatus] = useState<boolean>(false);
 
   const onHandleOpenEditBook = () => {
@@ -46,7 +47,12 @@ const Book: FC<{
           <ol
             className="absolute bottom-0 right-0 bg-gray-700 p-2 rounded-lg text-white text-sm flex flex-col"
             onMouseLeave={() => onHandleOpenEditBook()}
-            onClick={(e: any) => onHandleEditBook(book.id, e.target.value)}
+            onClick={(e: any) => {
+              if (updateFilteredBooksOnSelect) {
+                updateFilteredBooksOnSelect(book, e.target.value);
+              }
+              onHandleEditBook(book, e.target.value);
+            }}
           >
             <option disabled>Move to...</option>
             <option
@@ -76,7 +82,7 @@ const Book: FC<{
             <option
               value="none"
               className={`cursor-pointer hover:bg-slate-50/20 rounded ${
-                book.shelf === 'none' && 'bg-slate-50/20'
+                book.shelf === 'none' || (!book.shelf && 'bg-slate-50/20')
               }`}
             >
               None
@@ -86,7 +92,9 @@ const Book: FC<{
       </div>
       <div className="p-1">
         <h1 className="text-sm font-bold">{replaceBookTitle(book.title)}</h1>
-        <h2 className="text-sm font-thin">{book.authors}</h2>
+        <h2 className="text-sm font-thin">
+          {book.authors && book.authors[0] ? book.authors[0] : book.authors}
+        </h2>
       </div>
     </div>
   );

@@ -1,8 +1,10 @@
 import React, { FC, useEffect, useState } from 'react';
 import { AiOutlineArrowLeft } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
+import { search } from '../../API/BookAPI';
 import { bookType } from '../../Types';
 import Books from './Books';
+import { useDebounce } from 'use-debounce';
 
 const Search: FC<{ books: bookType[]; onHandleEditBook: Function }> = ({
   books,
@@ -10,27 +12,33 @@ const Search: FC<{ books: bookType[]; onHandleEditBook: Function }> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredBooks, setFilteredBooks] = useState<bookType[]>([]);
+  const [text] = useDebounce<string>(searchQuery, 200);
+
+  const updateFilteredBooksOnSelect = (book: bookType, shelf: string) => {
+    const newBooks = filteredBooks.map((b) => {
+      if (b.id === book.id) {
+        return {
+          ...book,
+          shelf,
+        };
+      }
+      return b;
+    });
+    setFilteredBooks(newBooks);
+  };
 
   useEffect(() => {
-    if (searchQuery) {
-      const searchFilter = (book: bookType) =>
-        [book.title, book.description, book.publisher, book.authors]
-          .join('')
-          .toLowerCase()
-          .indexOf(searchQuery.toLowerCase()) !== -1;
-
-      const filteredBooks = books.filter(searchFilter);
-      setFilteredBooks(filteredBooks);
+    if (text) {
+      const searchFilter = async () => {
+        const response = await search(text, 1);
+        if (!response.error) setFilteredBooks(response);
+        else setFilteredBooks([]);
+      };
+      searchFilter();
     } else {
-      setFilteredBooks(books);
+      setFilteredBooks([]);
     }
-  }, [searchQuery, books]);
-
-  useEffect(() => {
-    if (books) {
-      setFilteredBooks(books);
-    }
-  }, [books]);
+  }, [text]);
 
   return (
     <div>
@@ -40,16 +48,22 @@ const Search: FC<{ books: bookType[]; onHandleEditBook: Function }> = ({
         </Link>
         <input
           type="search"
-          placeholder="Search by title / description / publisher / authors"
+          placeholder="Search..."
           className="indent-2 py-2 h-full w-full outline-none border-l-2 text-black font-bold text-sm"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
       </div>
+      {searchQuery && filteredBooks.length < 1 && (
+        <h1 className="flex justify-center items-center font-bold mt-10">
+          No Search Found.
+        </h1>
+      )}
       <Books
         books={filteredBooks}
         title="None"
         onHandleEditBook={onHandleEditBook}
+        updateFilteredBooksOnSelect={updateFilteredBooksOnSelect}
       />
     </div>
   );

@@ -12,23 +12,30 @@ function App() {
     const fetchBooks = async () => {
       const books: bookType[] = await getAll();
       setBooks(books);
-      console.log(books)
     };
     fetchBooks();
   }, []);
 
-  const onHandleEditBook = async (id: string, shelf: string) => {
-    const newBooks = books.map((book) => {
-      if (book.id === id) {
-        return {
-          ...book,
-          shelf,
-        };
-      }
-      return book;
-    });
-    await update(id, shelf);
-    setBooks(newBooks);
+  const onHandleEditBook = async (book: bookType, shelf: string) => {
+    const findBook = books.findIndex((b) => b.id === book.id);
+    if (findBook === -1) {
+      setBooks((ps) => {
+        return [...ps, { ...book, shelf }];
+      });
+    } else {
+      const newBooks = books.map((b) => {
+        if (b.id === book.id) {
+          return {
+            ...book,
+            shelf,
+          };
+        }
+        return b;
+      });
+      setBooks(newBooks);
+    }
+    await update(book.id, shelf);
+    console.log(books);
   };
 
   return (

@@ -29,7 +29,7 @@ export const update = (id: string, shelf: string) =>
     body: JSON.stringify({ shelf }),
   }).then((res) => res.json());
 
-export const search = (query: any, maxResults: any) =>
+export const search = (query: string, maxResults: number) =>
   fetch(`${api}/search`, {
     method: 'POST',
     headers: {
