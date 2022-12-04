@@ -5,7 +5,7 @@ import Book from './Book';
 const Books: FC<{
   books: bookType[];
   onHandleEditBook: Function;
-  updateFilteredBooksOnSelect?: Function
+  updateFilteredBooksOnSelect?: Function;
   title: string;
 }> = ({ books, title, onHandleEditBook, updateFilteredBooksOnSelect }) => {
   return (

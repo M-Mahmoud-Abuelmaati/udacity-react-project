@@ -31,14 +31,34 @@ const Search: FC<{ books: bookType[]; onHandleEditBook: Function }> = ({
     if (text) {
       const searchFilter = async () => {
         const response = await search(text, 1);
-        if (!response.error) setFilteredBooks(response);
-        else setFilteredBooks([]);
+        if (!response.error) {
+          const data = response.map((fb: bookType) => {
+            const idx = books.findIndex((book) => book.id === fb.id);
+            if (idx !== -1) {
+              if (fb.id === books[idx].id) {
+                return { ...fb, shelf: books[idx].shelf };
+              }
+            }
+            return { ...fb, shelf: 'none' };
+          });
+          setFilteredBooks(data);
+        } else setFilteredBooks([]);
       };
       searchFilter();
     } else {
       setFilteredBooks([]);
     }
-  }, [text]);
+  }, [text, books]);
+
+  useEffect(() => {
+    if (filteredBooks) {
+      const updatedBooksOnSHelf = filteredBooks;
+      updatedBooksOnSHelf.map((ub) => {
+        return { ...ub, shelf: 'read' };
+      });
+      setFilteredBooks(updatedBooksOnSHelf);
+    }
+  }, [filteredBooks, books]);
 
   return (
     <div>

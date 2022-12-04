@@ -30,7 +30,7 @@ const Book: FC<{
       className="flex flex-col justify-evenly items-center gap-2 relative"
     >
       <img
-        src={book.imageLinks.thumbnail}
+        src={book.imageLinks ? book.imageLinks.thumbnail : ''}
         alt="thumbnail"
         className="object-fill w-52 h-full rounded cursor-pointer hover:animate-pulse"
         onClick={() =>
@@ -82,7 +82,7 @@ const Book: FC<{
             <option
               value="none"
               className={`cursor-pointer hover:bg-slate-50/20 rounded ${
-                book.shelf === 'none' || (!book.shelf && 'bg-slate-50/20')
+                book.shelf === 'none' && 'bg-slate-50/20'
               }`}
             >
               None
